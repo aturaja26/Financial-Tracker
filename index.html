@@ -1,0 +1,651 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Financial Tracker Premium</title>
+    <link rel="stylesheet" href="assets/css/style.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Sidebar -->
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <i class="fas fa-wallet"></i> FinTrack
+            </div>
+            <ul class="sidebar-nav">
+                <li class="nav-item active" data-target="dashboard">
+                    <i class="fas fa-home"></i> Dashboard
+                </li>
+                <li class="nav-item" data-target="transactions">
+                    <i class="fas fa-exchange-alt"></i> Transaksi
+                </li>
+                <li class="nav-item" data-target="budgets">
+                    <i class="fas fa-bullseye"></i> Budget
+                </li>
+                <li class="nav-item" data-target="goals">
+                    <i class="fas fa-piggy-bank"></i> Tabungan
+                </li>
+                <li class="nav-item" data-target="investments">
+                    <i class="fas fa-chart-line"></i> Investasi
+                </li>
+                <li class="nav-item" data-target="debts">
+                    <i class="fas fa-hand-holding-usd"></i> Utang
+                </li>
+                <li class="nav-item" data-target="subscriptions">
+                    <i class="fas fa-sync"></i> Langganan
+                </li>
+            </ul>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Topbar -->
+            <header class="topbar">
+                <button class="mobile-toggle" id="mobileToggle">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <div style="flex:1"></div>
+                <div class="topbar-right">
+                    <div class="health-score" id="healthScoreDisplay" title="Financial Health Score">
+                        <i class="fas fa-heartbeat text-success"></i> <span id="healthScoreValue">0</span>/100
+                    </div>
+                    <button class="theme-toggle" id="themeToggle">
+                        <i class="fas fa-moon"></i>
+                    </button>
+                    <div class="user-profile">
+                        <div class="user-avatar" id="userAvatar">U</div>
+                        <span id="userName">User</span>
+                    </div>
+                    <button class="btn btn-outline" id="logoutBtn" style="padding: 0.25rem 0.75rem; font-size: 0.875rem;">
+                        <i class="fas fa-sign-out-alt"></i>
+                    </button>
+                </div>
+            </header>
+
+            <!-- Content Area -->
+            <div class="content-area">
+                <!-- Dashboard View -->
+                <section id="view-dashboard" class="view-section active">
+                    <div class="page-header">
+                        <h2 class="page-title">Overview</h2>
+                    </div>
+                    
+                    <div class="kpi-grid">
+                        <div class="kpi-card">
+                            <div class="kpi-icon blue"><i class="fas fa-wallet"></i></div>
+                            <div class="kpi-details">
+                                <h4>Net Worth</h4>
+                                <h2 id="kpiNetWorth">Rp 0</h2>
+                            </div>
+                        </div>
+                        <div class="kpi-card">
+                            <div class="kpi-icon green"><i class="fas fa-arrow-down"></i></div>
+                            <div class="kpi-details">
+                                <h4>Total Pendapatan</h4>
+                                <h2 id="kpiIncome">Rp 0</h2>
+                            </div>
+                        </div>
+                        <div class="kpi-card">
+                            <div class="kpi-icon red"><i class="fas fa-arrow-up"></i></div>
+                            <div class="kpi-details">
+                                <h4>Total Pengeluaran</h4>
+                                <h2 id="kpiExpense">Rp 0</h2>
+                            </div>
+                        </div>
+                        <div class="kpi-card">
+                            <div class="kpi-icon purple"><i class="fas fa-coins"></i></div>
+                            <div class="kpi-details">
+                                <h4>Cash Flow</h4>
+                                <h2 id="kpiCashFlow">Rp 0</h2>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="charts-grid">
+                        <div class="chart-card">
+                            <h3>Income vs Expense</h3>
+                            <div style="position: relative; height: 250px; width: 100%;">
+                                <canvas id="barChart"></canvas>
+                            </div>
+                        </div>
+                        <div class="chart-card">
+                            <h3>Pengeluaran by Kategori</h3>
+                            <div style="position: relative; height: 250px; width: 100%;">
+                                <canvas id="pieChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="chart-card mt-4" style="margin-bottom: 2rem;">
+                        <h3>Net Worth Trend</h3>
+                        <div style="position: relative; height: 200px; width: 100%;">
+                            <canvas id="lineChart"></canvas>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Transactions View -->
+                <section id="view-transactions" class="view-section">
+                    <div class="page-header">
+                        <h2 class="page-title">Transaksi</h2>
+                        <button class="btn btn-primary" onclick="openModal('txModal')">
+                            <i class="fas fa-plus"></i> Tambah Transaksi
+                        </button>
+                    </div>
+                    <div class="table-card">
+                        <div class="table-responsive">
+                            <table id="txTable">
+                                <thead>
+                                    <tr>
+                                        <th>Tanggal</th>
+                                        <th>Deskripsi</th>
+                                        <th>Kategori</th>
+                                        <th>Jenis</th>
+                                        <th>Nominal</th>
+                                        <th>Aksi</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <!-- Dynamic rows -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Budgets View -->
+                <section id="view-budgets" class="view-section">
+                    <div class="page-header">
+                        <h2 class="page-title">Budget Planner</h2>
+                        <button class="btn btn-primary" onclick="openModal('budgetModal')">
+                            <i class="fas fa-plus"></i> Tambah Budget
+                        </button>
+                    </div>
+                    <div class="table-card" id="budgetContainer">
+                        <!-- Dynamic budget items -->
+                    </div>
+                </section>
+
+                <!-- Goals View -->
+                <section id="view-goals" class="view-section">
+                    <div class="page-header">
+                        <h2 class="page-title">Savings Goals</h2>
+                        <button class="btn btn-primary" onclick="openModal('goalModal')">
+                            <i class="fas fa-plus"></i> Tambah Tujuan
+                        </button>
+                    </div>
+                    <div class="kpi-grid" id="goalContainer">
+                        <!-- Dynamic goal cards -->
+                    </div>
+                </section>
+
+                <!-- Investments View -->
+                <section id="view-investments" class="view-section">
+                    <div class="page-header">
+                        <h2 class="page-title">Investment Tracker</h2>
+                        <button class="btn btn-primary" onclick="openModal('investModal')">
+                            <i class="fas fa-plus"></i> Tambah Investasi
+                        </button>
+                    </div>
+                    <div class="table-card">
+                        <table id="investTable">
+                            <thead>
+                                <tr>
+                                    <th>Aset</th>
+                                    <th>Kategori</th>
+                                    <th>Modal</th>
+                                    <th>Nilai Saat Ini</th>
+                                    <th>Return</th>
+                                    <th>Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                </section>
+
+                <!-- Debts View -->
+                <section id="view-debts" class="view-section">
+                    <div class="page-header">
+                        <h2 class="page-title">Debt Tracker</h2>
+                        <button class="btn btn-primary" onclick="openModal('debtModal')">
+                            <i class="fas fa-plus"></i> Tambah Utang
+                        </button>
+                    </div>
+                    <div class="table-card">
+                        <table id="debtTable">
+                            <thead>
+                                <tr>
+                                    <th>Nama Utang</th>
+                                    <th>Total Utang</th>
+                                    <th>Sisa Utang</th>
+                                    <th>Cicilan/Bln</th>
+                                    <th>Progress</th>
+                                    <th>Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                </section>
+
+                <!-- Subscriptions View -->
+                <section id="view-subscriptions" class="view-section">
+                    <div class="page-header">
+                        <h2 class="page-title">Langganan (Subscriptions)</h2>
+                        <button class="btn btn-primary" onclick="openModal('subModal')">
+                            <i class="fas fa-plus"></i> Tambah Langganan
+                        </button>
+                    </div>
+                    <div class="kpi-card mb-4" style="max-width:300px;">
+                        <div class="kpi-icon red"><i class="fas fa-calendar-alt"></i></div>
+                        <div class="kpi-details">
+                            <h4>Total Biaya per Bulan</h4>
+                            <h2 id="kpiSubTotal">Rp 0</h2>
+                        </div>
+                    </div>
+                    <div class="table-card">
+                        <table id="subTable">
+                            <thead>
+                                <tr>
+                                    <th>Nama Langganan</th>
+                                    <th>Biaya Bulanan</th>
+                                    <th>Tanggal Bayar</th>
+                                    <th>Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                </section>
+            </div>
+        </main>
+    </div>
+
+    <!-- Modals -->
+    <!-- Transaction Modal -->
+    <div class="modal-overlay" id="txModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Form Transaksi</h3>
+                <button class="close-modal" onclick="closeModal('txModal')">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="txForm">
+                    <input type="hidden" id="txId">
+                    <div class="form-group">
+                        <label>Tanggal</label>
+                        <input type="date" id="txDate" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Jenis</label>
+                        <select id="txType" class="form-control" onchange="updateTxCategories()" required>
+                            <option value="income">Income</option>
+                            <option value="expense">Expense</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Kategori</label>
+                        <select id="txCategory" class="form-control" required></select>
+                    </div>
+                    <div class="form-group">
+                        <label>Deskripsi</label>
+                        <input type="text" id="txDesc" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Nominal (Rp)</label>
+                        <input type="number" id="txAmount" class="form-control" required min="0">
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-outline" onclick="closeModal('txModal')">Batal</button>
+                <button class="btn btn-primary" onclick="saveTransaction()">Simpan</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Budget Modal -->
+    <div class="modal-overlay" id="budgetModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Form Budget</h3>
+                <button class="close-modal" onclick="closeModal('budgetModal')">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="budgetForm">
+                    <input type="hidden" id="budgetId">
+                    <div class="form-group">
+                        <label>Kategori</label>
+                        <select id="budgetCategory" class="form-control" required>
+                            <option value="Makanan">Makanan</option>
+                            <option value="Transportasi">Transportasi</option>
+                            <option value="Belanja">Belanja</option>
+                            <option value="Tagihan">Tagihan</option>
+                            <option value="Hiburan">Hiburan</option>
+                            <option value="Pendidikan">Pendidikan</option>
+                            <option value="Kesehatan">Kesehatan</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Batas Budget (Rp)</label>
+                        <input type="number" id="budgetLimit" class="form-control" required min="0">
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-outline" onclick="closeModal('budgetModal')">Batal</button>
+                <button class="btn btn-primary" onclick="saveBudget()">Simpan</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Goal Modal -->
+    <div class="modal-overlay" id="goalModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Form Tujuan Tabungan</h3>
+                <button class="close-modal" onclick="closeModal('goalModal')">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="goalForm">
+                    <input type="hidden" id="goalId">
+                    <div class="form-group">
+                        <label>Nama Tujuan</label>
+                        <input type="text" id="goalName" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Target Dana (Rp)</label>
+                        <input type="number" id="goalTarget" class="form-control" required min="0">
+                    </div>
+                    <div class="form-group">
+                        <label>Dana Saat Ini (Rp)</label>
+                        <input type="number" id="goalCurrent" class="form-control" required min="0">
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-outline" onclick="closeModal('goalModal')">Batal</button>
+                <button class="btn btn-primary" onclick="saveGoal()">Simpan</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Invest Modal -->
+    <div class="modal-overlay" id="investModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Form Investasi</h3>
+                <button class="close-modal" onclick="closeModal('investModal')">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="investForm">
+                    <input type="hidden" id="investId">
+                    <div class="form-group">
+                        <label>Nama Aset</label>
+                        <input type="text" id="investName" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Kategori</label>
+                        <select id="investCategory" class="form-control" required>
+                            <option value="Saham">Saham</option>
+                            <option value="Reksa Dana">Reksa Dana</option>
+                            <option value="Kripto">Kripto</option>
+                            <option value="Emas">Emas</option>
+                            <option value="Lainnya">Lainnya</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Modal (Rp)</label>
+                        <input type="number" id="investCapital" class="form-control" required min="0">
+                    </div>
+                    <div class="form-group">
+                        <label>Nilai Saat Ini (Rp)</label>
+                        <input type="number" id="investCurrent" class="form-control" required min="0">
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-outline" onclick="closeModal('investModal')">Batal</button>
+                <button class="btn btn-primary" onclick="saveInvest()">Simpan</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Debt Modal -->
+    <div class="modal-overlay" id="debtModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Form Utang</h3>
+                <button class="close-modal" onclick="closeModal('debtModal')">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="debtForm">
+                    <input type="hidden" id="debtId">
+                    <div class="form-group">
+                        <label>Nama Utang</label>
+                        <input type="text" id="debtName" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Total Utang (Rp)</label>
+                        <input type="number" id="debtTotal" class="form-control" required min="0">
+                    </div>
+                    <div class="form-group">
+                        <label>Sisa Utang (Rp)</label>
+                        <input type="number" id="debtRemaining" class="form-control" required min="0">
+                    </div>
+                    <div class="form-group">
+                        <label>Cicilan Bulanan (Rp)</label>
+                        <input type="number" id="debtMonthly" class="form-control" required min="0">
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-outline" onclick="closeModal('debtModal')">Batal</button>
+                <button class="btn btn-primary" onclick="saveDebt()">Simpan</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Sub Modal -->
+    <div class="modal-overlay" id="subModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Form Langganan</h3>
+                <button class="close-modal" onclick="closeModal('subModal')">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="subForm">
+                    <input type="hidden" id="subId">
+                    <div class="form-group">
+                        <label>Nama Langganan</label>
+                        <input type="text" id="subName" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Biaya Bulanan (Rp)</label>
+                        <input type="number" id="subCost" class="form-control" required min="0">
+                    </div>
+                    <div class="form-group">
+                        <label>Tanggal Bayar (1-31)</label>
+                        <input type="number" id="subDate" class="form-control" required min="1" max="31">
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-outline" onclick="closeModal('subModal')">Batal</button>
+                <button class="btn btn-primary" onclick="saveSub()">Simpan</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Firebase SDK (Compat) -->
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+    <script src="assets/js/firebase-config.js"></script>
+    <script src="assets/js/auth.js"></script>
+    <script src="assets/js/dashboard.js"></script>
+    <script src="assets/js/transaction.js"></script>
+    <script src="assets/js/budget.js"></script>
+    <script src="assets/js/investment.js"></script>
+    <script src="assets/js/debt.js"></script>
+    <script src="assets/js/goal.js"></script>
+    <script src="assets/js/subscription.js"></script>
+    
+    <script>
+        // Main App Logic
+        const auth = new Auth();
+        let currentUserData = null;
+        let currentUser = null;
+
+        // Formatter
+        const formatRupiah = (number) => {
+            return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(number);
+        };
+
+        document.addEventListener('DOMContentLoaded', () => {
+            // Monitor Firebase Auth state
+            authInstance.onAuthStateChanged(async (user) => {
+                if (!user) {
+                    window.location.href = 'login.html';
+                    return;
+                }
+
+                currentUser = auth.getCurrentUser();
+                document.getElementById('userName').textContent = currentUser.fullname;
+                document.getElementById('userAvatar').textContent = currentUser.fullname.charAt(0).toUpperCase();
+
+                // Tampilkan loader sementara data di-load
+                document.getElementById('kpiNetWorth').textContent = "Loading...";
+
+                await loadUserData();
+                
+                initTheme();
+                initNavigation();
+                initCharts(); // from dashboard.js
+                
+                // Initial render
+                renderAll();
+
+                // Logout
+                document.getElementById('logoutBtn').addEventListener('click', () => auth.logout());
+
+                // Modal setup categories
+                updateTxCategories();
+            });
+        });
+
+        async function loadUserData() {
+            try {
+                const docRef = db.collection("users_data").doc(authInstance.currentUser.uid);
+                const docSnap = await docRef.get();
+                if (docSnap.exists) {
+                    currentUserData = docSnap.data();
+                } else {
+                    // Inisialisasi struktur data kosong untuk user baru
+                    currentUserData = {
+                        transactions: [], budgets: [], goals: [], investments: [], debts: [], subscriptions: []
+                    };
+                    await docRef.set(currentUserData);
+                }
+            } catch (error) {
+                console.error("Gagal memuat data dari Firestore:", error);
+                alert("Gagal mengambil data dari cloud. Silakan coba muat ulang halaman.");
+                currentUserData = {
+                    transactions: [], budgets: [], goals: [], investments: [], debts: [], subscriptions: []
+                };
+            }
+        }
+
+        async function saveUserData() {
+            try {
+                const docRef = db.collection("users_data").doc(authInstance.currentUser.uid);
+                await docRef.set(currentUserData);
+                renderAll(); // Segarkan tampilan setelah berhasil menyimpan
+            } catch (error) {
+                console.error("Gagal menyimpan data ke Firestore:", error);
+                alert("Gagal menyimpan data ke cloud: " + error.message);
+            }
+        }
+
+        function renderAll() {
+            renderDashboard();      // from dashboard.js
+            renderTransactions();   // from transaction.js
+            renderBudgets();        // from budget.js
+            renderGoals();          // from goal.js
+            renderInvestments();    // from investment.js
+            renderDebts();          // from debt.js
+            renderSubscriptions();  // from subscription.js
+        }
+
+        // Navigation
+        function initNavigation() {
+            const navItems = document.querySelectorAll('.nav-item');
+            const sections = document.querySelectorAll('.view-section');
+
+            navItems.forEach(item => {
+                item.addEventListener('click', () => {
+                    navItems.forEach(n => n.classList.remove('active'));
+                    item.classList.add('active');
+                    
+                    const target = item.getAttribute('data-target');
+                    sections.forEach(s => {
+                        s.classList.remove('active');
+                        if (s.id === `view-${target}`) {
+                            s.classList.add('active');
+                        }
+                    });
+                    
+                    // Close mobile sidebar if open
+                    document.getElementById('sidebar').classList.remove('active');
+                });
+            });
+
+            document.getElementById('mobileToggle').addEventListener('click', () => {
+                document.getElementById('sidebar').classList.toggle('active');
+            });
+        }
+
+        // Theme
+        function initTheme() {
+            const themeToggle = document.getElementById('themeToggle');
+            const savedTheme = localStorage.getItem('theme') || 'light';
+            
+            if (savedTheme === 'dark') {
+                document.documentElement.setAttribute('data-theme', 'dark');
+                themeToggle.innerHTML = '<i class="fas fa-sun"></i>';
+            }
+
+            themeToggle.addEventListener('click', () => {
+                const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+                if (isDark) {
+                    document.documentElement.removeAttribute('data-theme');
+                    localStorage.setItem('theme', 'light');
+                    themeToggle.innerHTML = '<i class="fas fa-moon"></i>';
+                } else {
+                    document.documentElement.setAttribute('data-theme', 'dark');
+                    localStorage.setItem('theme', 'dark');
+                    themeToggle.innerHTML = '<i class="fas fa-sun"></i>';
+                }
+                updateChartColors(); // Re-render charts for theme
+            });
+        }
+
+        // Modals Logic
+        function openModal(id) {
+            document.getElementById(id).classList.add('active');
+        }
+        function closeModal(id) {
+            document.getElementById(id).classList.remove('active');
+            // Clear inputs
+            const form = document.getElementById(id).querySelector('form');
+            if(form) form.reset();
+            const hiddenId = document.getElementById(id).querySelector('input[type="hidden"]');
+            if(hiddenId) hiddenId.value = '';
+        }
+    </script>
+</body>
+</html>
